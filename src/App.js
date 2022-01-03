@@ -2,7 +2,7 @@ import { useState,useEffect,useRef} from 'react';
 import { FaSearch } from "react-icons/fa";
 
 const api = {
-  key: "73916e94274abc0225c6d6e3c8b6a997",
+  key: "91b924e946dc78229ede1a12224881d1",
   base: "https://api.openweathermap.org/data/2.5/"
 }
 function App() {
