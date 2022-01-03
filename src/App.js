@@ -1,4 +1,4 @@
-import { useState,useEffect } from 'react';
+import { useState,useEffect,useRef} from 'react';
 import { FaSearch } from "react-icons/fa";
 
 const api = {
@@ -8,6 +8,12 @@ const api = {
 function App() {
   const [query, setQuery] = useState('');
   const [weather,setWeather] =useState([]);
+  const [clock,setClock] = useState('0:00:00 AM');
+  
+  const stateRef=useRef();
+  stateRef.current =weather;
+
+  const isFirstRun=useRef(true);
 
   const search = (e) =>{
     e.preventDefault();
@@ -20,13 +26,20 @@ function App() {
       });
     
   }
-  const timeBuilder = () =>{
-    let t= new Date();
-    let time=new Date(t.getTime()+(t.getTimezoneOffset()*60000)+(weather.timezone*1000));
-    console.log(time.getHours());
-    return time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-  }
-    
+  
+  useEffect(()=>{
+    if(isFirstRun.current){
+      isFirstRun.current=false;
+      return;
+    }
+    setInterval(() => {
+      let t= new Date();
+      let time=new Date(t.getTime()+(t.getTimezoneOffset()*60000)+(stateRef.current.timezone*1000));
+      console.log(stateRef.current.timezone)
+      setClock(time.toLocaleTimeString());
+    }, 1000);
+  },[weather])
+
 
   const dateBuilder = (d) =>{
     const months=["January","Febuary","March","April","May","June","July","August","September","October","November","December"];
@@ -46,7 +59,7 @@ function App() {
   }
 
   return (
-    <div className={(typeof weather.main != 'undefined' ? ((weather.main.temp>16) ? 'App warm':'App'): 'App')}>
+    <div className={(typeof weather.main != 'undefined' ? (`App `+stateRef.current.weather[0].main): 'App')}>
       <main>
         <form className="searchBox">
           <input 
@@ -63,7 +76,7 @@ function App() {
             <div className="locationBox">
               <div className="location">{weather.name},{weather.sys.country}</div>
               <div className="date">{dateBuilder(new Date())}</div>
-              <div className="time">{timeBuilder()}</div>
+              <div className="time">{clock}</div>
             </div>
             <div className="weatherBox">
               <div className="temp">{Math.round(weather.main.temp)}&deg;C</div>
